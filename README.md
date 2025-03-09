@@ -56,7 +56,9 @@ $ echo "go mod vendor"
 ## Features
 
 - [x] wrapper zap lib, [![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/uber-go/zap?label=zap%20latest%20go.md)](https://github.com/uber-go/zap)
-- [x] support load config by viper [![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/spf13/viper?label=viper%20latest%20go.md)](https://github.com/spf13/viper)
+- [x] log rolling package [![GitHub go.mod Go version (branch)](https://img.shields.io/github/go-mod/go-version/natefinch/lumberjack/v2.0?label=lumberjack%20v2%20go.mod)](https://github.com/natefinch/lumberjack)
+- load by config kit
+  - [x] support load config by viper [![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/spf13/viper?label=viper%20latest%20go.md)](https://github.com/spf13/viper)
 
 - [ ] more perfect test case coverage
 - [ ] more perfect benchmark case
@@ -67,10 +69,7 @@ $ echo "go mod vendor"
 
 ## usage
 
-- use this template, replace list below
-    - `github.com/sinlov-go/zlog-zap-wrapper` to your package name
-    - `sinlov-go` to your owner name
-    - `zlog-zap-wrapper` to your project name
+- more see [doc/LIB.md](doc/LIB.md)
 
 ## dev
 

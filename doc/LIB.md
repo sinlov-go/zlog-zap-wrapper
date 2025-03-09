@@ -1,39 +1,50 @@
-# github.com/stretchr/testify
-
-[github.com/stretchr/testify](https://github.com/stretchr/testify)
-
-```bash
-go mod edit -require='github.com/stretchr/testify@v1.8.4'
-go mod vendor
-```
-
-fast use
+## code
 
 ```go
-package main_test
-import (
-  "testing"
-  "github.com/stretchr/testify/assert"
-)
+package config
 
-func TestSomething(t *testing.T) {
-
-  // assert equality
-  assert.Equal(t, 123, 123, "they should be equal")
-
-  // assert inequality
-  assert.NotEqual(t, 123, 456, "they should not be equal")
-
-  // assert for nil (good for errors)
-  assert.Nil(t, object)
-
-  // assert for not nil (good when you expect something)
-  if assert.NotNil(t, object) {
-
-    // now we know that object isn't nil, we are safe to make
-    // further assertions without causing any errors
-    assert.Equal(t, "Something", object.Value)
-
-  }
+func InitLogger(zLogsConfig *zlog.LogsConfig)  (error) {
+	errInitZlog := zlog.InitLogger(*zLogsConfig)
+	if errInitZlog != nil {
+		return errInitZlog
+	}
 }
+```
+
+## load by viper
+
+### viper libs 
+
+- go.mod
+
+```go
+package foo
+
+import (
+	"github.com/spf13/viper"
+	"go.uber.org/zap"
+	"gopkg.in/natefinch/lumberjack.v2"
+)
+```
+
+### config yml
+
+```yml
+logs:
+  # 日志等级(-1:Debug, 0:Info, 1:Warn, 2:Error, 3:DPanic, 4:Panic, 5:Fatal, -1<=level<=5, 参照 zap. level 源码)
+  level: 0
+  # 是否开启 stdout 输出，只影响 Error 之前的输出, 正式建议关闭，全写在文件中
+  stdout-enable: true
+  # 日志文件 base 路径, 如果为空则 只输出到 stdout， 不为空，则自动区分 不同等级放置日志
+  path-base: logs/log
+  # 是否日志文件根目录使用执行程序所在的目录，默认使用当前运行的目录
+  path-use-executable: false
+  # 日志文件最大大小, M
+  max-size: 50
+  # 日志备份数
+  max-backups: 7
+  # 日志存放时间, 天
+  max-age: 30
+  # 日志是否压缩
+  compress: false
 ```
