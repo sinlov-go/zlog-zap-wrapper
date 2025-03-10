@@ -34,6 +34,22 @@ func Example() {
 	zlog.Log().Info("hello zlog")
 }
 
+func TestPruneLogs(t *testing.T) {
+	logsConfig := zlog.LogsConfigDefault()
+	logsConfig.PathBase = "log/log"
+
+	errInitLogger := zlog.InitLogger(logsConfig)
+	if errInitLogger != nil {
+		panic(errInitLogger)
+	}
+
+	zlog.Log().Info("hello zlog")
+
+	getConfig := zlog.GetLoggerConfig()
+	assert.NotNil(t, getConfig)
+	zlog.Log().Infof("log folder: %s", getConfig.PathBase)
+}
+
 func TestInitLogger(t *testing.T) {
 	// mock InitLogger
 	type args struct {
@@ -84,6 +100,9 @@ func TestInitLogger(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 
+			errRemoveInit := zlog.DestructorInit()
+			assert.Nil(t, errRemoveInit)
+
 			// do InitLogger
 			logsConfigFlavors := tc.args.flavors
 			gotErr := zlog.InitLogger(tc.args.config, logsConfigFlavors...)
@@ -118,9 +137,6 @@ func TestInitLogger(t *testing.T) {
 			//pruneLogFolder, gotErrPruneLogs := getConfig.PruneLogs()
 			//assert.Nil(t, gotErrPruneLogs)
 			//t.Logf("prune Logs at folder: %s", pruneLogFolder)
-
-			errRemoveInit := zlog.DestructorInit()
-			assert.Nil(t, errRemoveInit)
 		})
 	}
 }

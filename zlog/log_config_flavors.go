@@ -40,19 +40,16 @@ func (l *LogsConfigFlavors) DeepCopyFromConfig(name string, src LogsConfig) erro
 	return nil
 }
 
-func (l *LogsConfigFlavors) DeepCopyToConfig() (cfg *LogsConfig, err error) {
+func (l *LogsConfigFlavors) DeepCopyToConfig() (*LogsConfig, error) {
 	var buffer bytes.Buffer
 	if errNewEncoder := gob.NewEncoder(&buffer).Encode(l.LogsConfig); errNewEncoder != nil {
-		err = errNewEncoder
-		return
+		return nil, errNewEncoder
 	}
-	var newLogsConfig LogsConfig
-	if errNewDecoder := gob.NewDecoder(&buffer).Decode(&newLogsConfig); errNewDecoder != nil {
-		err = errNewDecoder
-		return
+	var newLogsConfig = new(LogsConfig)
+	if errNewDecoder := gob.NewDecoder(&buffer).Decode(newLogsConfig); errNewDecoder != nil {
+		return nil, errNewDecoder
 	}
-	cfg = &newLogsConfig
-	return
+	return newLogsConfig, nil
 }
 
 //	deep copy from src

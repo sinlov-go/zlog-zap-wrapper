@@ -8,6 +8,7 @@ import (
 // DestructorInit
 // destructor init
 // warning, this will let panic(), make sure what you want to do.
+// Most use before InitLogger()
 func DestructorInit() error {
 	rwLockInit.Lock()
 
