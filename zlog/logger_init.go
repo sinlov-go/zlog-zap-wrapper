@@ -89,7 +89,7 @@ func initFlavorsLogger(config LogsConfig, flavors []LogsConfigFlavors) error {
 			return errDeepCopyToConfig
 		}
 		if config.PathBase == flavorCopyConfig.PathBase {
-			flavorCopyConfig.PathBase = filepath.Join(flavorCopyConfig.PathBase, flavorConfig.Name)
+			flavorCopyConfig.PathBase = path.Join(flavorCopyConfig.PathBase, flavorConfig.Name)
 		}
 		logger, _, errInitLoggerByConfig := initLoggerByConfig(*flavorCopyConfig)
 		if errInitLoggerByConfig != nil {
