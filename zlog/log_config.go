@@ -5,6 +5,7 @@ import (
 	"encoding/gob"
 	"go.uber.org/zap/zapcore"
 	"os"
+	"path/filepath"
 )
 
 func LogsConfigDefault() LogsConfig {
@@ -125,17 +126,19 @@ func (l *LogsConfig) DeepCopyNew() (*LogsConfig, error) {
 //
 // "" and nil if no error is can not be pruned by folder not exits
 func (l *LogsConfig) PruneLogs() (string, error) {
-	exists, errPathExits := pathExists(l.PathBase)
+	localPath := filepath.Join(l.PathBase)
+
+	exists, errPathExits := pathExists(localPath)
 	if errPathExits != nil || !exists {
 		return "", nil
 	}
 
-	errRemoveAll := os.RemoveAll(l.PathBase)
+	errRemoveAll := os.RemoveAll(localPath)
 	if errRemoveAll != nil {
-		return l.PathBase, errRemoveAll
+		return localPath, errRemoveAll
 	}
 
-	return l.PathBase, nil
+	return localPath, nil
 }
 
 func pathExists(path string) (bool, error) {
