@@ -202,8 +202,8 @@ func initLoggerByConfig(config LogsConfig) (*zap.Logger, *LogsConfig, error) {
 }
 
 func coreLogArrInit(logArr []zapcore.Core, logPathBase string, config LogsConfig, encoder zapcore.Encoder, now time.Time) []zapcore.Core {
-	infoLogFileName := fmt.Sprintf("%s/info/%04d-%02d-%02d.log", logPathBase, now.Year(), now.Month(), now.Day())
-	errorLogFileName := fmt.Sprintf("%s/error/%04d-%02d-%02d.log", config.PathBase, now.Year(), now.Month(), now.Day())
+	infoLogFileName := path.Join(logPathBase, "info", fmt.Sprintf("%04d-%02d-%02d.log", now.Year(), now.Month(), now.Day()))
+	errorLogFileName := path.Join(logPathBase, "error", fmt.Sprintf("%04d-%02d-%02d.log", now.Year(), now.Month(), now.Day()))
 
 	// 高日志级别
 	highPriority := zap.LevelEnablerFunc(func(level zapcore.Level) bool {
