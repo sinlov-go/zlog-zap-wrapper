@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [convention-change-log](https://github.com/convention-change/convention-change-log) for commit guidelines.
 
+## [1.0.1](https://github.com/sinlov-go/zlog-zap-wrapper/compare/1.0.0...v1.0.1) (2025-03-10)
+
+### 📝 Documentation
+
+* update golang-codecov workflow to use codecov-action v5 ([c297c36b](https://github.com/sinlov-go/zlog-zap-wrapper/commit/c297c36beda2dbc91e66ff4a43dd13f256b01220))
+
 ## 1.0.0 (2025-03-10)
 
 ### 🐛 Bug Fixes
