@@ -48,6 +48,10 @@ func TestPruneLogs(t *testing.T) {
 	getConfig := zlog.GetLoggerConfig()
 	assert.NotNil(t, getConfig)
 	zlog.Log().Infof("log folder: %s", getConfig.PathBase)
+
+	pruneLogFolder, gotErrPruneLogs := getConfig.PruneLogs()
+	assert.Nil(t, gotErrPruneLogs)
+	t.Logf("prune Logs at folder: %s", pruneLogFolder)
 }
 
 func TestInitLogger(t *testing.T) {
