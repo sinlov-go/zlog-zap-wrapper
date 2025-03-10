@@ -5,8 +5,10 @@ import (
 	"go.uber.org/zap"
 )
 
-//nolint:golint,unused
-func removeInit() error {
+// DestructorInit
+// destructor init
+// warning, this will let panic(), make sure what you want to do.
+func DestructorInit() error {
 	rwLockInit.Lock()
 
 	logSugared = nil
