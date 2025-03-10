@@ -4,6 +4,7 @@ import (
 	"github.com/sinlov-go/zlog-zap-wrapper/zlog"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
+	"runtime"
 	"testing"
 )
 
@@ -48,6 +49,15 @@ func TestPruneLogs(t *testing.T) {
 	getConfig := zlog.GetLoggerConfig()
 	assert.NotNil(t, getConfig)
 	zlog.Log().Infof("log folder: %s", getConfig.PathBase)
+
+	// is system windows
+	if runtime.GOOS == "windows" {
+		t.Skip("skip test on windows, by err like &fs.PathError{Op:\"remove\", Path:\"log\\\\log\\\\info\\\\xxx.log\", Err:0x20}")
+	} else {
+		pruneLogFolder, gotErrPruneLogs := getConfig.PruneLogs()
+		assert.Nil(t, gotErrPruneLogs)
+		t.Logf("prune Logs at folder: %s", pruneLogFolder)
+	}
 }
 
 func TestInitLogger(t *testing.T) {
