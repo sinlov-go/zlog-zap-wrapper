@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [convention-change-log](https://github.com/convention-change/convention-change-log) for commit guidelines.
 
+## [1.0.2](https://github.com/sinlov-go/zlog-zap-wrapper/compare/1.0.1...v1.0.2) (2025-03-10)
+
+### 👷‍ Build System
+
+* update codecov action and rename config file ([3b54471c](https://github.com/sinlov-go/zlog-zap-wrapper/commit/3b54471c3ec70bbffd1ff440d3ec83c9181879ef))
+
 ## [1.0.1](https://github.com/sinlov-go/zlog-zap-wrapper/compare/1.0.0...v1.0.1) (2025-03-10)
 
 ### 📝 Documentation
