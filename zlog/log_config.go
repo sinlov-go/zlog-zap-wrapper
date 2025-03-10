@@ -133,6 +133,11 @@ func (l *LogsConfig) PruneLogs() (string, error) {
 		return "", nil
 	}
 
+	errChangeChmod := os.Chmod(localPath, 0755)
+	if errChangeChmod != nil {
+		return localPath, errChangeChmod
+	}
+
 	errRemoveAll := os.RemoveAll(localPath)
 	if errRemoveAll != nil {
 		return localPath, errRemoveAll
