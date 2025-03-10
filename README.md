@@ -57,8 +57,9 @@ $ echo "go mod vendor"
 
 - [x] wrapper zap lib, [![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/uber-go/zap?label=zap%20latest%20go.md)](https://github.com/uber-go/zap)
 - [x] log rolling package [![GitHub go.mod Go version (branch)](https://img.shields.io/github/go-mod/go-version/natefinch/lumberjack/v2.0?label=lumberjack%20v2%20go.mod)](https://github.com/natefinch/lumberjack)
-- load by config kit
+- [x] load by config kit
   - [x] support load config by viper [![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/spf13/viper?label=viper%20latest%20go.md)](https://github.com/spf13/viper)
+- [x] support `zlog.LogsConfigFlavors` to init more flavors logger
 
 - [ ] more perfect test case coverage
 - [ ] more perfect benchmark case
