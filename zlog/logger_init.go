@@ -7,7 +7,6 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 	"os"
 	"path"
-	"path/filepath"
 	"sync"
 	"time"
 )
@@ -117,7 +116,7 @@ func initLoggerByConfig(config LogsConfig) (*zap.Logger, *LogsConfig, error) {
 	if config.PathUseExecutable {
 		execPath, errExecutable := os.Executable()
 		if errExecutable == nil {
-			nowConfigPathBase := filepath.Base(logPathBase)
+			nowConfigPathBase := path.Base(logPathBase)
 			logPathBase = path.Join(path.Dir(execPath), nowConfigPathBase)
 		}
 	}
