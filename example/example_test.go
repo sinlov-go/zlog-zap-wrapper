@@ -3,6 +3,8 @@ package example
 import (
 	"github.com/sinlov-go/zlog-zap-wrapper/zlog"
 	"github.com/spf13/viper"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 // To use this lib, can load by viper
@@ -30,4 +32,95 @@ func Example() {
 	}
 
 	zlog.Log().Info("hello zlog")
+}
+
+func TestInitLogger(t *testing.T) {
+	// mock InitLogger
+	type args struct {
+		//
+		config  zlog.LogsConfig
+		flavors []zlog.LogsConfigFlavors
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "debug",
+			args: args{
+				config: zlog.LogsConfigDebug(),
+			},
+		},
+		{
+			name: "production",
+			args: args{
+				config: zlog.LogsConfigProduction(),
+			},
+		},
+		{
+			name: "default",
+			args: args{
+				config: zlog.LogsConfigDefault(),
+			},
+		},
+		{
+			name: "default-with-flavor",
+			args: args{
+				config: zlog.LogsConfigDefault(),
+				flavors: []zlog.LogsConfigFlavors{
+					{
+						Name:       "foo",
+						LogsConfig: zlog.LogsConfigDefault(),
+					},
+					{
+						Name:       "bar",
+						LogsConfig: zlog.LogsConfigDefault(),
+					},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+
+			// do InitLogger
+			logsConfigFlavors := tc.args.flavors
+			gotErr := zlog.InitLogger(tc.args.config, logsConfigFlavors...)
+
+			// verify InitLogger
+			assert.Equal(t, tc.wantErr, gotErr != nil)
+			if tc.wantErr {
+				t.Logf("want init error %v", gotErr)
+				return
+			}
+			getConfig := zlog.GetLoggerConfig()
+			assert.NotNil(t, getConfig)
+			zlog.Log().Infof("init zlog success by mode name: %s", tc.name)
+
+			assert.Equal(t, tc.args.config.Level, getConfig.Level)
+
+			if len(logsConfigFlavors) > 0 {
+				for _, flavor := range logsConfigFlavors {
+					flavorsLogger := zlog.GetFlavorsLogger(flavor.Name)
+					assert.NotNil(t, flavorsLogger)
+					assert.Equal(t, flavor.Level, flavorsLogger.Level())
+
+					flavorsSugaredLogger := zlog.GetFlavorsSugaredLogger(flavor.Name)
+					assert.NotNil(t, flavorsSugaredLogger)
+					assert.Equal(t, flavor.Level, flavorsSugaredLogger.Level())
+					flavorsSugaredLogger.Infof("just use flavors as: %s", flavor.Name)
+				}
+			}
+
+			// windows will got error like
+			// got: &fs.PathError{Op:"remove", Path:"logs\\log\\bar\\info\\xxxx", Err:0x20}
+			//pruneLogFolder, gotErrPruneLogs := getConfig.PruneLogs()
+			//assert.Nil(t, gotErrPruneLogs)
+			//t.Logf("prune Logs at folder: %s", pruneLogFolder)
+
+			errRemoveInit := zlog.DestructorInit()
+			assert.Nil(t, errRemoveInit)
+		})
+	}
 }

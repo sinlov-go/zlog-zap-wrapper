@@ -1,22 +1,24 @@
-package zlog
+package zlog_test
+
+import "github.com/sinlov-go/zlog-zap-wrapper/zlog"
 
 // To use zlog, must call InitLogger before use
 // the SetOutput function when your application starts.
 // Default logger use Log to use.
 func Example_zLogInitLogger() {
-	cfg := LogsConfigDefault()
-	flavorsBar := LogsConfigFlavors{}
+	cfg := zlog.LogsConfigDefault()
+	flavorsBar := zlog.LogsConfigFlavors{}
 	errDeepCopy := flavorsBar.DeepCopyFromConfig("bar", cfg)
 	if errDeepCopy != nil {
 		panic(errDeepCopy)
 	}
 
-	errInit := InitLogger(cfg)
+	errInit := zlog.InitLogger(cfg)
 	if errInit != nil {
 		panic(errInit)
 	}
 
-	Log().Info("init success")
+	zlog.Log().Info("init success")
 }
 
 // To use zlog, must call InitLogger before use
@@ -26,22 +28,22 @@ func Example_zLogInitLogger() {
 // flavors get from GetFlavorsSugaredLogger to use.
 func Example_zLogInitWithFlavors() {
 	// init config
-	cfg := LogsConfigDefault()
+	cfg := zlog.LogsConfigDefault()
 	// init flavors
-	flavorsBar := LogsConfigFlavors{}
+	flavorsBar := zlog.LogsConfigFlavors{}
 	errDeepCopy := flavorsBar.DeepCopyFromConfig("bar", cfg)
 	if errDeepCopy != nil {
 		panic(errDeepCopy)
 	}
-	configFlavors := []LogsConfigFlavors{flavorsBar}
+	configFlavors := []zlog.LogsConfigFlavors{flavorsBar}
 
 	// do zlog init
-	errInit := InitLogger(cfg, configFlavors...)
+	errInit := zlog.InitLogger(cfg, configFlavors...)
 	if errInit != nil {
 		panic(errInit)
 	}
 
 	// use to print log
-	Log().Info("init success")
-	GetFlavorsSugaredLogger("bar").Info("bar flavors info")
+	zlog.Log().Info("init success")
+	zlog.GetFlavorsSugaredLogger("bar").Info("bar flavors info")
 }
