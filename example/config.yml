@@ -1,0 +1,12 @@
+logs:
+  level: 1
+  caller-hide: false
+  caller-disable-dynamic: false
+  caller-full-path: false
+  stdout-enable: true
+  path-base: logs/log
+  path-use-executable: false
+  max-size: 10
+  max-backups: 7
+  max-age: 360
+  compress: true
