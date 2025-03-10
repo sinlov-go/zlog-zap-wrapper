@@ -8,11 +8,11 @@ import (
 // DynamicCallerEncoder
 // custom encoder: dynamically hide INFO-level call paths
 type DynamicCallerEncoder struct {
-	zapcore.Encoder // 内嵌原始编码器（如JSON或Console）
+	zapcore.Encoder // embedded raw encoder (JSON or Console）
 }
 
 func (enc *DynamicCallerEncoder) EncodeEntry(ent zapcore.Entry, fields []zapcore.Field) (*buffer.Buffer, error) {
-	switch ent.Level { // 清空调用路径
+	switch ent.Level { // clear call path
 	default:
 	// do nothing
 	case zapcore.DebugLevel:

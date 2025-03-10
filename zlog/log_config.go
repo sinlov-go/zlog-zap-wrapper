@@ -59,6 +59,8 @@ func LogsConfigDebug() LogsConfig {
 }
 
 type LogsConfig struct {
+	ConfigDeepCopy
+
 	// log level by zapcore.Level
 	// Note: debug will serialize the string to all uppercase and add color. Other levels will not be affected.
 	Level zapcore.Level `mapstructure:"level" json:"level" yaml:"level"`
@@ -83,6 +85,12 @@ type LogsConfig struct {
 	MaxAge int `mapstructure:"max-age" json:"maxAge" yaml:"max-age"`
 	// whether the log is compressed
 	Compress bool `mapstructure:"compress" json:"compress" yaml:"compress"`
+}
+
+type ConfigDeepCopy interface {
+	DeepCopyFrom(src LogsConfig) error
+	DeepCopyNew() (*LogsConfig, error)
+	PruneLogs() (string, error)
 }
 
 //	deep copy from src

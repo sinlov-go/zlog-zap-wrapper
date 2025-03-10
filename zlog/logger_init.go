@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"sync"
 	"time"
 )
 
@@ -19,6 +20,10 @@ func GetLoggerConfig() LogsConfig {
 }
 
 var savedLoggerConfig *LogsConfig
+
+var (
+	rwLockInit sync.RWMutex
+)
 
 // InitLogger 初始化日志
 //
@@ -42,11 +47,70 @@ var savedLoggerConfig *LogsConfig
 //	  max-age: 30
 //	  # 日志是否压缩
 //	  compress: false
-func InitLogger(config LogsConfig) error {
+func InitLogger(config LogsConfig, flavors ...LogsConfigFlavors) error {
 
+	rwLockInit.Lock()
+
+	if savedLoggerConfig != nil {
+		logSugared.Warn("zap log already initialized")
+		defer rwLockInit.Unlock()
+		return nil
+	}
+
+	logger, copyNewConfig, errInitLoggerByConfig := initLoggerByConfig(config)
+	if errInitLoggerByConfig != nil {
+		defer rwLockInit.Unlock()
+		return errInitLoggerByConfig
+	}
+
+	if len(flavors) > 0 {
+		errInitFlavorsLogger := initFlavorsLogger(config, flavors)
+		if errInitFlavorsLogger != nil {
+			defer rwLockInit.Unlock()
+			return errInitFlavorsLogger
+		}
+	}
+
+	logSugared = logger.Sugar()
+	savedLoggerConfig = copyNewConfig
+
+	logSugared.Info("initialize zap log complete")
+	//logSugared.Infof("initialize zap log complete, log path at: %s", savedLoggerConfig.PathBase)
+	//logSugared.Errorf("initialize zap error case")
+
+	defer rwLockInit.Unlock()
+	return nil
+}
+
+func initFlavorsLogger(config LogsConfig, flavors []LogsConfigFlavors) error {
+	for _, flavorConfig := range flavors {
+		flavorCopyConfig, errDeepCopyToConfig := flavorConfig.DeepCopyToConfig()
+		if errDeepCopyToConfig != nil {
+			return errDeepCopyToConfig
+		}
+		if config.PathBase == flavorCopyConfig.PathBase {
+			flavorCopyConfig.PathBase = filepath.Join(flavorCopyConfig.PathBase, flavorConfig.Name)
+		}
+		logger, _, errInitLoggerByConfig := initLoggerByConfig(*flavorCopyConfig)
+		if errInitLoggerByConfig != nil {
+			return errInitLoggerByConfig
+		}
+		if loggerFlavorsMap == nil {
+			loggerFlavorsMap = make(map[string]*zap.Logger)
+		}
+		loggerFlavorsMap[flavorConfig.Name] = logger
+		if logSugaredFlavorsMap == nil {
+			logSugaredFlavorsMap = make(map[string]*zap.SugaredLogger)
+		}
+		logSugaredFlavorsMap[flavorConfig.Name] = logger.Sugar()
+	}
+	return nil
+}
+
+func initLoggerByConfig(config LogsConfig) (*zap.Logger, *LogsConfig, error) {
 	copyNewConfig, errDeepCopyNew := config.DeepCopyNew()
 	if errDeepCopyNew != nil {
-		return errDeepCopyNew
+		return nil, nil, errDeepCopyNew
 	}
 
 	logPathBase := config.PathBase
@@ -60,8 +124,6 @@ func InitLogger(config LogsConfig) error {
 	copyNewConfig.PathBase = logPathBase
 
 	var coreArr []zapcore.Core
-	var accessArr []zapcore.Core
-	var cronArr []zapcore.Core
 
 	//var encoderConfig zapcore.EncoderConfig
 	//if copyNewConfig.CallerHide {
@@ -117,7 +179,7 @@ func InitLogger(config LogsConfig) error {
 	}
 
 	encoderConsole := zapcore.NewConsoleEncoder(encoderConfig)
-	if !config.CallDisableDynamic {
+	if !copyNewConfig.CallDisableDynamic {
 		dynamicEncoder := &DynamicCallerEncoder{
 			Encoder: encoderConsole,
 		}
@@ -125,66 +187,18 @@ func InitLogger(config LogsConfig) error {
 	}
 
 	levelAt := zap.NewAtomicLevelAt(copyNewConfig.Level)
-	if logPathBase == "" { // only stdout
+	if copyNewConfig.PathBase == "" { // only stdout
 		stdoutCore := zapcore.NewCore(encoderConsole, zapcore.AddSync(os.Stdout), levelAt)
 		coreArr = append(coreArr, stdoutCore)
-		accessArr = append(accessArr, stdoutCore)
-		cronArr = append(cronArr, stdoutCore)
 	} else {
 		now := time.Now()
-		coreArr = coreLogArrInit(coreArr, logPathBase, *copyNewConfig, encoderConsole, now)
-		accessArr = accessLogArrInit(accessArr, logPathBase, *copyNewConfig, encoderConsole, now)
-		cronArr = cronLogArrInit(accessArr, logPathBase, *copyNewConfig, encoderConsole, now)
+		coreArr = coreLogArrInit(coreArr, copyNewConfig.PathBase, *copyNewConfig, encoderConsole, now)
 	}
 
-	callerEnableOption := zap.WithCaller(!config.CallerHide)
-
-	accessLogger := zap.New(zapcore.NewTee(accessArr...), zap.AddCaller(), callerEnableOption)
-	accessLoggerGlobal = accessLogger
-
-	cronLogger := zap.New(zapcore.NewTee(cronArr...), zap.AddCaller(), callerEnableOption)
-	cronLoggerGlobal = cronLogger
+	callerEnableOption := zap.WithCaller(!copyNewConfig.CallerHide)
 
 	logger := zap.New(zapcore.NewTee(coreArr...), zap.AddCaller(), callerEnableOption)
-
-	logSugared = logger.Sugar()
-
-	savedLoggerConfig = copyNewConfig
-
-	logSugared.Infof("initialize zap log complete, log path at: %s", savedLoggerConfig.PathBase)
-	//logSugared.Errorf("initialize zap error case")
-
-	return nil
-}
-
-func accessLogArrInit(logArr []zapcore.Core, logPathBase string, config LogsConfig, encoder zapcore.Encoder, now time.Time) []zapcore.Core {
-	return zapLogArrInit(logArr, logPathBase, config, encoder, now, "access")
-}
-
-func cronLogArrInit(logArr []zapcore.Core, logPathBase string, config LogsConfig, encoder zapcore.Encoder, now time.Time) []zapcore.Core {
-	return zapLogArrInit(logArr, logPathBase, config, encoder, now, "cron")
-}
-
-func zapLogArrInit(logArr []zapcore.Core, logPathBase string, config LogsConfig, encoder zapcore.Encoder, now time.Time, dirName string) []zapcore.Core {
-	fileNameLogFileName := fmt.Sprintf("%s/%s/%s-%04d-%02d-%02d.log", logPathBase, dirName, dirName, now.Year(), now.Month(), now.Day())
-	logFileWriteSyncer := zapcore.AddSync(&lumberjack.Logger{
-		Filename:   fileNameLogFileName, //日志文件存放目录，如果文件夹不存在会自动创建
-		MaxSize:    config.MaxSize,      //文件大小限制,单位MB
-		MaxAge:     config.MaxAge,       //日志文件保留天数
-		MaxBackups: config.MaxBackups,   //最大保留日志文件数量
-		LocalTime:  false,
-		Compress:   config.Compress, //是否压缩处理
-	})
-	logWriteSyncer := zapcore.NewMultiWriteSyncer(logFileWriteSyncer)
-	if config.StdoutEnable {
-		logWriteSyncer = zapcore.NewMultiWriteSyncer(logFileWriteSyncer, zapcore.AddSync(os.Stdout))
-	}
-	logPriority := zap.LevelEnablerFunc(func(level zapcore.Level) bool {
-		return true
-	})
-	loggerFileCore := zapcore.NewCore(encoder, logWriteSyncer, logPriority)
-	logArr = append(logArr, loggerFileCore)
-	return logArr
+	return logger, copyNewConfig, nil
 }
 
 func coreLogArrInit(logArr []zapcore.Core, logPathBase string, config LogsConfig, encoder zapcore.Encoder, now time.Time) []zapcore.Core {
