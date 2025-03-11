@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [convention-change-log](https://github.com/convention-change/convention-change-log) for commit guidelines.
 
+## [1.1.1](https://github.com/sinlov-go/zlog-zap-wrapper/compare/1.1.0...v1.1.1) (2025-03-11)
+
+### 📝 Documentation
+
+* update example test and add log messages ([f5570868](https://github.com/sinlov-go/zlog-zap-wrapper/commit/f55708680b2462a29657440b5089ef9e2998b999))
+
 ## [1.1.0](https://github.com/sinlov-go/zlog-zap-wrapper/compare/1.0.2...v1.1.0) (2025-03-11)
 
 ### ✨ Features
