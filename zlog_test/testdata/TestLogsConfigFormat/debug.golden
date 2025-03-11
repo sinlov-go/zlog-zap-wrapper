@@ -1,0 +1,13 @@
+{
+  "level": "debug",
+  "callerHide": false,
+  "callDisableDynamic": false,
+  "callFullPath": true,
+  "stdoutEnable": true,
+  "pathBase": "logs/log",
+  "pathUseExecutable": false,
+  "maxSize": 10,
+  "maxBackups": 7,
+  "maxAge": 30,
+  "compress": false
+}

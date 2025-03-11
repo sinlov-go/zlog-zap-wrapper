@@ -1,0 +1,14 @@
+{
+  "name": "default",
+  "level": "info",
+  "callerHide": false,
+  "callDisableDynamic": false,
+  "callFullPath": false,
+  "stdoutEnable": true,
+  "pathBase": "logs/log",
+  "pathUseExecutable": false,
+  "maxSize": 10,
+  "maxBackups": 7,
+  "maxAge": 360,
+  "compress": true
+}

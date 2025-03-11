@@ -9,7 +9,7 @@ import (
 type LogsConfigFlavors struct {
 	Name string `mapstructure:"name" json:"name" yaml:"name"`
 	LogsConfig
-	ConfigFlavorsDeepCopy
+	ConfigFlavorsDeepCopy `mapstructure:"-" json:"-" yaml:"-"`
 }
 
 type ConfigFlavorsDeepCopy interface {
