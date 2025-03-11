@@ -7,11 +7,6 @@ import "github.com/sinlov-go/zlog-zap-wrapper/zlog"
 // Default logger use Log to use.
 func Example_zLogInitLogger() {
 	cfg := zlog.LogsConfigDefault()
-	flavorsBar := zlog.LogsConfigFlavors{}
-	errDeepCopy := flavorsBar.DeepCopyFromConfig("bar", cfg)
-	if errDeepCopy != nil {
-		panic(errDeepCopy)
-	}
 
 	errInit := zlog.InitLogger(cfg)
 	if errInit != nil {
@@ -19,6 +14,11 @@ func Example_zLogInitLogger() {
 	}
 
 	zlog.Log().Info("init success")
+	zlog.Log().Debug("this is debug")
+	zlog.Log().Warn("this is warn")
+	zlog.Log().Error("this is error")
+
+	//// Output:
 }
 
 // To use zlog, must call InitLogger before use

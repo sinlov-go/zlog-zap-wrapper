@@ -33,6 +33,10 @@ func Example() {
 	}
 
 	zlog.Log().Info("hello zlog")
+	zlog.Log().Info("init success")
+	zlog.Log().Debug("this is debug")
+	zlog.Log().Warn("this is warn")
+	zlog.Log().Error("this is error")
 }
 
 func TestPruneLogs(t *testing.T) {
