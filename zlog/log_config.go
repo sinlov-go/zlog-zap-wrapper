@@ -60,7 +60,7 @@ func LogsConfigDebug() LogsConfig {
 }
 
 type LogsConfig struct {
-	ConfigDeepCopy
+	ConfigDeepCopy `mapstructure:"-" json:"-" yaml:"-"`
 
 	// log level by zapcore.Level
 	// Note: debug will serialize the string to all uppercase and add color. Other levels will not be affected.

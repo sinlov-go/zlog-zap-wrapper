@@ -1,6 +1,7 @@
 package zlog_test
 
 import (
+	"github.com/sebdah/goldie/v2"
 	"github.com/sinlov-go/zlog-zap-wrapper/zlog"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -80,6 +81,67 @@ func TestLogsConfigFlavors(t *testing.T) {
 			errDeepCopyFrom := logsNewCopyFlavors.DeepCopyFrom(logsCfgFlavors)
 			assert.Equal(t, tc.wantErr, errDeepCopyFrom != nil)
 			assert.Equal(t, logsCfgFlavors, *copyNew)
+		})
+	}
+}
+
+func TestLogsConfigFlavorsFormat(t *testing.T) {
+	// mock LogsConfigFlavorsFormat
+	type args struct {
+		name   string
+		config zlog.LogsConfig
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "error",
+			args: args{
+				config: zlog.LogsConfigDefault(),
+			},
+			wantErr: true,
+		},
+		{
+			name: "default",
+			args: args{
+				name:   "default",
+				config: zlog.LogsConfigDefault(),
+			},
+		},
+		{
+			name: "production",
+			args: args{
+				name:   "production",
+				config: zlog.LogsConfigProduction(),
+			},
+		},
+		{
+			name: "debug",
+			args: args{
+				name:   "debug",
+				config: zlog.LogsConfigDebug(),
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			g := goldie.New(t,
+				goldie.WithDiffEngine(goldie.ClassicDiff),
+			)
+
+			logsCfgFlavors := zlog.LogsConfigFlavors{}
+			errCopyFromConfig := logsCfgFlavors.DeepCopyFromConfig(tc.args.name, tc.args.config)
+			assert.Equal(t, tc.wantErr, errCopyFromConfig != nil)
+			if tc.wantErr {
+				t.Logf("err DeepCopyFromConfig %v", errCopyFromConfig)
+				return
+			}
+
+			// do LogsConfigFlavorsFormat
+			// verify LogsConfigFlavorsFormat
+			g.AssertJson(t, t.Name(), logsCfgFlavors)
 		})
 	}
 }

@@ -1,0 +1,14 @@
+{
+  "name": "production",
+  "level": "warn",
+  "callerHide": false,
+  "callDisableDynamic": false,
+  "callFullPath": true,
+  "stdoutEnable": false,
+  "pathBase": "logs/log",
+  "pathUseExecutable": false,
+  "maxSize": 10,
+  "maxBackups": 7,
+  "maxAge": 720,
+  "compress": true
+}
