@@ -3,9 +3,10 @@ package zlog
 import (
 	"bytes"
 	"encoding/gob"
-	"go.uber.org/zap/zapcore"
 	"os"
 	"path/filepath"
+
+	"go.uber.org/zap/zapcore"
 )
 
 func LogsConfigDefault() LogsConfig {
@@ -130,6 +131,7 @@ func (l *LogsConfig) PruneLogs() (string, error) {
 
 	exists, errPathExits := pathExists(localPath)
 	if errPathExits != nil || !exists {
+		// nolint: nilerr
 		return "", nil
 	}
 
