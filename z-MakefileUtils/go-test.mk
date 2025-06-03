@@ -46,6 +46,15 @@ else
 	@go test -test.v ${ENV_ROOT_TEST_LIST}
 endif
 
+.PHONY: test.go.update
+test.go.update:
+	@echo "=> run test start"
+ifeq ($(OS),Windows_NT)
+	-@go test -test.v ${ENV_ROOT_TEST_LIST} -v -update
+else
+	-@go test -test.v ${ENV_ROOT_TEST_LIST} -v -update
+endif
+
 .PHONY: test.go.fail
 test.go.fail:
 	@echo "=> run test timeout ${ENV_ROOT_TEST_MAX_TIME}, if not find FAIL, will exit 1"
