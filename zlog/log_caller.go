@@ -12,6 +12,7 @@ type DynamicCallerEncoder struct {
 }
 
 func (enc *DynamicCallerEncoder) EncodeEntry(ent zapcore.Entry, fields []zapcore.Field) (*buffer.Buffer, error) {
+	// nolint: exhaustive
 	switch ent.Level { // clear call path
 	default:
 	// do nothing
