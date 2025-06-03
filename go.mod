@@ -1,8 +1,8 @@
 module github.com/sinlov-go/zlog-zap-wrapper
 
-go 1.21.0
+go 1.23
 
-toolchain go1.24.1
+toolchain go1.23.8
 
 require (
 	github.com/sebdah/goldie/v2 v2.5.5
